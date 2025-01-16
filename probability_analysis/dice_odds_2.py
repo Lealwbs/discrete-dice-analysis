@@ -1,5 +1,5 @@
 import numpy as np
-from math import pow, sqrt
+from math import pow
 
 def what_are_the_odds(sum_value, dices):
     # Verifica se a soma desejada é impossível com a quantidade de dados fornecida.
