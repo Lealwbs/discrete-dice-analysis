@@ -1,0 +1,131 @@
+main cpp
+
+#include "aluno.hpp"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iomanip>
+
+int main() {
+    std::vector<Aluno> alunos;
+    std::string nome;
+
+    // Entrada dos dados
+    while (true) {
+        std::getline(std::cin, nome);
+        if (nome == "END") break;
+
+        int matricula;
+        std::cin >> matricula;
+
+        std::vector<int> notas;
+        int nota;
+        while (std::cin >> nota && nota != -1) {
+            notas.push_back(nota);
+        }
+        std::cin.ignore(); // Ignora o caractere de nova linha residual
+
+        alunos.emplace_back(nome, matricula, notas);
+    }
+
+    // Ordenar os alunos pelo nome
+    std::sort(alunos.begin(), alunos.end(), [](const Aluno& a, const Aluno& b) {
+        return a.getNome() < b.getNome();
+    });
+
+    // Relatório
+    for (const auto& aluno : alunos) {
+        std::cout << aluno.getMatricula() << " " << aluno.getNome() << " ";
+        for (int nota : aluno.getNotas()) {
+            std::cout << nota << " ";
+        }
+        std::cout << "\n";
+
+        std::cout << std::fixed << std::setprecision(2) 
+                  << aluno.calcularMedia() << " " 
+                  << aluno.notaMaxima() << " " 
+                  << aluno.notaMinima() << "\n";
+    }
+
+    return 0;
+}
+
+
+
+
+---------
+
+aluno cpp
+
+#include "aluno.hpp"
+#include <algorithm>
+#include <numeric>
+
+// Construtor
+Aluno::Aluno(const std::string& nome, int matricula, const std::vector<int>& notas)
+    : nome(nome), matricula(matricula), notas(notas) {}
+
+// Métodos de acesso
+std::string Aluno::getNome() const {
+    return nome;
+}
+
+int Aluno::getMatricula() const {
+    return matricula;
+}
+
+std::vector<int> Aluno::getNotas() const {
+    return notas;
+}
+
+// Métodos de processamento
+double Aluno::calcularMedia() const {
+    if (notas.empty()) return 0.0;
+    double soma = std::accumulate(notas.begin(), notas.end(), 0);
+    return soma / notas.size();
+}
+
+int Aluno::notaMaxima() const {
+    return *std::max_element(notas.begin(), notas.end());
+}
+
+int Aluno::notaMinima() const {
+    return *std::min_element(notas.begin(), notas.end());
+}
+
+
+
+---
+
+aluno hpp
+
+#ifndef ALUNO_HPP
+#define ALUNO_HPP
+
+#include <string>
+#include <vector>
+
+class Aluno {
+private:
+    std::string nome;
+    int matricula;
+    std::vector<int> notas;
+
+public:
+    // Construtor
+    Aluno(const std::string& nome, int matricula, const std::vector<int>& notas);
+
+    // Métodos de acesso
+    std::string getNome() const;
+    int getMatricula() const;
+    std::vector<int> getNotas() const;
+
+    // Métodos de processamento
+    double calcularMedia() const;
+    int notaMaxima() const;
+    int notaMinima() const;
+};
+
+#endif
+
