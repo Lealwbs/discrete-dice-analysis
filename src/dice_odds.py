@@ -1,16 +1,18 @@
 """
-Cálculo exato de probabilidades de somas de dados.
+Calculo exato de probabilidades para a soma de dados honestos.
+Inclui programacao dinamica com memoizacao e a formula classica de De Moivre.
 """
 
 from functools import lru_cache
-from math import comb, pow
+from math import comb
 from typing import Dict
 
 
-@lru_cache(maxsize=4096)
+@lru_cache(maxsize=8192)
 def exact_dice_count(sum_value: int, num_dice: int, sides: int = 6) -> int:
     """
-    Retorna a quantidade de combinações favoráveis para a soma em num_dice dados.
+    Retorna o numero exato de tuplas ordenadas (d_1, ..., d_n) em {1, ..., sides}^n
+    cuja soma vale sum_value.
     """
     if num_dice < 1 or sum_value < num_dice or sum_value > sides * num_dice:
         return 0
@@ -18,7 +20,7 @@ def exact_dice_count(sum_value: int, num_dice: int, sides: int = 6) -> int:
     if num_dice == 1:
         return 1 if 1 <= sum_value <= sides else 0
 
-    # Simetria da distribuição
+    # Aproveita a simetria da distribuicao em torno de n * (sides + 1) / 2
     total_center = (sides + 1) * num_dice
     if sum_value > total_center // 2:
         sum_value = total_center - sum_value
@@ -36,19 +38,19 @@ def exact_dice_count(sum_value: int, num_dice: int, sides: int = 6) -> int:
 
 def exact_dice_odds(sum_value: int, num_dice: int, sides: int = 6) -> float:
     """
-    Retorna a probabilidade exata P(Soma = sum_value) com num_dice dados.
+    Retorna a probabilidade exata P(S_n = sum_value) no lancamento de num_dice dados.
     """
     if num_dice < 1 or sum_value < num_dice or sum_value > sides * num_dice:
         return 0.0
 
-    total_outcomes = pow(sides, num_dice)
     favorable_ways = exact_dice_count(sum_value, num_dice, sides)
+    total_outcomes = sides ** num_dice
     return favorable_ways / total_outcomes
 
 
 def de_moivre_dice_probability(sum_value: int, num_dice: int, sides: int = 6) -> float:
     """
-    Fórmula clássica de Abraham de Moivre (1718) para somas de dados.
+    Calcula P(S_n = sum_value) pela formula de inclusao-exclusao de Abraham de Moivre (1711).
     """
     if num_dice < 1 or sum_value < num_dice or sum_value > sides * num_dice:
         return 0.0
@@ -61,19 +63,20 @@ def de_moivre_dice_probability(sum_value: int, num_dice: int, sides: int = 6) ->
     total_ways = 0
     for j in range(max_j + 1):
         sign = -1 if (j % 2 == 1) else 1
-        c1 = comb(n, j)
-        c2 = comb(k - s * j - 1, n - 1)
-        total_ways += sign * c1 * c2
+        total_ways += sign * comb(n, j) * comb(k - s * j - 1, n - 1)
 
-    return total_ways / pow(s, n)
+    return total_ways / (s ** n)
 
 
 def dice_distribution(num_dice: int, sides: int = 6) -> Dict[int, float]:
     """
-    Retorna um dicionário {soma: probabilidade} para todas as somas possíveis.
+    Retorna um dicionario {soma: probabilidade} para todas as somas possiveis.
     """
-    return {s: exact_dice_odds(s, num_dice, sides) for s in range(num_dice, num_dice * sides + 1)}
+    return {
+        k: exact_dice_odds(k, num_dice, sides)
+        for k in range(num_dice, num_dice * sides + 1)
+    }
 
 
-# Alias para compatibilidade
+# Nome original mantido para compatibilidade com as primeiras versoes do repositorio
 what_are_the_odds = exact_dice_odds
