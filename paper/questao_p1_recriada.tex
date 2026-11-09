@@ -1,0 +1,131 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{array,booktabs,tabularx}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\geometry{margin=1.8cm, top=1.6cm, bottom=1.6cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\pagestyle{empty}
+
+\newtcolorbox{exambox}[1][]{
+    colback=white,
+    colframe=black!75,
+    boxrule=0.8pt,
+    arc=2pt,
+    left=9pt,
+    right=9pt,
+    top=6pt,
+    bottom=6pt,
+    fonttitle=\bfseries\small,
+    coltitle=black,
+    colbacktitle=black!8,
+    #1
+}
+
+\newtcolorbox{heuristicbox}[1][]{
+    colback=blue!3!white,
+    colframe=blue!55!black,
+    boxrule=0.8pt,
+    arc=2pt,
+    left=9pt,
+    right=9pt,
+    top=6pt,
+    bottom=6pt,
+    fonttitle=\bfseries\small,
+    #1
+}
+
+\begin{document}
+
+\begin{center}
+    {\Large \textbf{Questão Original da Prova de Matemática Discreta}}\\[0.2em]
+    {\normalsize Universidade Federal de Minas Gerais (DCC / ICEx / UFMG)}\\[0.15em]
+    {\footnotesize Baseada em Kenneth H. Rosen, \textit{Discrete Mathematics and Its Applications}, Cap. 7, Seção 7.1, Exercícios 36 e 37}
+\end{center}
+
+\vspace{0.2em}
+
+\textbf{4. (20 pontos)}
+
+\textbf{(a) O que é mais provável: sair um total de 8 quando dois dados são lançados ou sair um total de 8 quando três dados são lançados?}
+
+\begin{exambox}[title={Resolução combinatória por contagem direta (conforme folha de prova)}]
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{}p{0.37\textwidth}|X@{}}
+\textbf{Lançamento de 2 dados} & \textbf{Lançamento de 3 dados} \\
+\hline
+\textbf{Soma 8} ($5$ pares ordenados): &
+\textbf{Soma 8} ($21$ trincas ordenadas): \\
+$(2,6),\; (6,2),$ &
+$(1,1,6),\; (1,6,1),\; (6,1,1),\; (1,2,5),\; (1,5,2),\; (2,1,5),\; (2,5,1),$ \\
+$(3,5),\; (5,3),$ &
+$(5,1,2),\; (5,2,1),\; (1,3,4),\; (1,4,3),\; (3,1,4),\; (3,4,1),\; (4,1,3),$ \\
+$(4,4)$ &
+$(4,3,1),\; (2,2,4),\; (2,4,2),\; (4,2,2),\; (2,3,3),\; (3,2,3),\; (3,3,2)$ \\[0.35em]
+Probabilidade: $\displaystyle P(S_2 = 8) = \frac{5}{36} = \frac{30}{216}$ &
+Probabilidade: $\displaystyle P(S_3 = 8) = \frac{21}{216}$
+\end{tabularx}
+
+\vspace{0.35em}
+\hrule
+\vspace{0.35em}
+\centering
+Comparação: \quad
+$\displaystyle \boxed{\frac{30}{216}} > \frac{21}{216} \quad \Longrightarrow \quad$
+\textbf{Mais provável quando 2 dados são lançados.}
+\end{exambox}
+
+\vspace{0.25em}
+
+\textbf{(b) O que é mais provável: sair um total de 9 quando dois dados são lançados ou sair um total de 9 quando três dados são lançados?}
+
+\begin{exambox}[title={Resolução combinatória por contagem direta (conforme folha de prova)}]
+\textbf{2 dados} ($4$ pares ordenados): \quad
+$(3,6),\; (4,5),\; (5,4),\; (6,3) \quad \longrightarrow \quad \displaystyle P(S_2 = 9) = \frac{4}{36} = \frac{24}{216}$
+
+\vspace{0.3em}
+\textbf{3 dados} ($25$ trincas ordenadas, organizadas pelo resultado do primeiro dado):
+\vspace{-0.4em}
+\begin{align*}
+d_1 = 1: &\quad (1,2,6),\; (1,3,5),\; (1,4,4),\; (1,5,3),\; (1,6,2) && \text{($5$ casos)}\\
+d_1 = 2: &\quad (2,1,6),\; (2,2,5),\; (2,3,4),\; (2,4,3),\; (2,5,2),\; (2,6,1) && \text{($6$ casos)}\\
+d_1 = 3: &\quad (3,1,5),\; (3,2,4),\; (3,3,3),\; (3,4,2),\; (3,5,1) && \text{($5$ casos)}\\
+d_1 = 4: &\quad (4,1,4),\; (4,2,3),\; (4,3,2),\; (4,4,1) && \text{($4$ casos)}\\
+d_1 = 5: &\quad (5,1,3),\; (5,2,2),\; (5,3,1) && \text{($3$ casos)}\\
+d_1 = 6: &\quad (6,1,2),\; (6,2,1) && \text{($2$ casos)}
+\end{align*}
+\vspace{-0.7em}
+\hrule
+\vspace{0.35em}
+\centering
+$\displaystyle P(S_3 = 9) = \frac{5 + 6 + 5 + 4 + 3 + 2}{6^3} = \frac{25}{216}
+\qquad \Longrightarrow \qquad
+\frac{25}{216} > \frac{4}{36} = \frac{24}{216} \quad \Longrightarrow \quad \boxed{\textbf{3 dados}}$
+\end{exambox}
+
+\vspace{0.25em}
+
+\begin{heuristicbox}[title={Resolução alternativa apresentada em prova (Heurística da Distância até a Média)}]
+Em vez de enumerar todas as tuplas, um estudante comparou a distância absoluta de cada soma alvo até a esperança (média) de cada lançamento, sabendo que a média de um dado honesto de $6$ faces é $\mu_1 = 3{,}5$:
+\[
+E[S_2] = 2 \times 3{,}5 = 7{,}0 \qquad \text{e} \qquad E[S_3] = 3 \times 3{,}5 = 10{,}5
+\]
+\vspace{-0.6em}
+\begin{itemize}[leftmargin=1.5em, itemsep=0.2em, topsep=0.1em]
+    \item \textbf{Item (a), soma $k = 8$:} \quad
+    $|8 - E[S_2]| = |8 - 7{,}0| = 1{,}0 < |8 - E[S_3]| = |8 - 10{,}5| = 2{,}5 \;\Longrightarrow\;$ \textbf{2 dados.}
+    \item \textbf{Item (b), soma $k = 9$:} \quad
+    $|9 - E[S_3]| = |9 - 10{,}5| = 1{,}5 < |9 - E[S_2]| = |9 - 7{,}0| = 2{,}0 \;\Longrightarrow\;$ \textbf{3 dados.}
+\end{itemize}
+\vspace{0.1em}
+\textbf{Por que funcionou na prova, mas falha no caso geral?} O ponto médio aritmético entre $7{,}0$ e $10{,}5$ é $8{,}75$, que cai entre os inteiros $8$ e $9$, exatamente no mesmo intervalo que o ponto de virada contínuo real ($x^* \approx 8{,}98$). Por essa coincidência numérica, a heurística acerta os dois itens da avaliação, embora falhe quando o número de dados se afasta (por exemplo, entre $2$ e $5$ dados na soma $12$, ou entre $2$ e $6$ dados na soma $13$).
+\end{heuristicbox}
+
+\end{document}
