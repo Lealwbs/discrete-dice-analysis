@@ -1,0 +1,25 @@
+Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+
+Copyright (c) 2024-2026 Italo Leal (DCC / ICEx / UFMG)
+
+Este arquivo aplica-se exclusivamente aos manuscritos cientificos, textos em LaTeX,
+tabelas, reconstrucoes e figuras contidos no diretorio `paper/` (incluindo `artigo.tex`,
+`artigo.pdf`, `questao_p1_recriada.tex`, `questao_p1_recriada.pdf` e `paper/figures/`).
+
+Voce tem o direito de:
+- Compartilhar: copiar e redistribuir o material em qualquer suporte ou formato,
+  desde que em sua forma original e integral.
+
+Sob os seguintes termos:
+- Atribuicao (BY): Voce deve dar o credito apropriado ao autor (Italo Leal),
+  prover um link para a licenca e para o repositorio original
+  (https://github.com/Lealwbs/discrete-dice-analysis).
+- NaoComercial (NC): Voce nao pode usar o material para fins comerciais.
+- SemDerivacoes (ND): Se voce remixar, transformar ou criar a partir do material,
+  voce nao pode distribuir o material modificado sem autorizacao expressa do autor.
+
+Todos os demais direitos autorais e patrimoniais sobre o manuscrito para fins de
+submissao e publicacao em periodicos cientificos ou anais de eventos permanecem
+reservados ao autor.
+
+Texto legal completo: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode

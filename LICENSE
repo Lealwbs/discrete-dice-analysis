@@ -1,6 +1,12 @@
-MIT License
+MIT License (Software and Source Code)
 
-Copyright (c) 2025 Italo Leal
+Copyright (c) 2024-2026 Italo Leal
+
+Note on Dual Licensing:
+This MIT License applies to the Python source code, scripts, and tooling in this
+repository (`src/`, `main.py`, `requirements.txt`). The academic manuscript,
+LaTeX sources, and figures in `paper/` are licensed separately under
+CC BY-NC-ND 4.0 (see `paper/LICENSE-PAPER.txt`).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
