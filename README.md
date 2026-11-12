@@ -254,6 +254,25 @@ print(monte_carlo_odds(target_sum=8, num_dice=3, num_rolls=100_000, seed=42))
 
 ---
 
+## Como citar
+
+Se você utilizar o código, as figuras ou os resultados do artigo em algum trabalho acadêmico ou projeto, utilize a referência abaixo:
+
+```bibtex
+@misc{leal2026crossover,
+  author       = {Ítalo Leal},
+  title        = {Quando a Distância até a Média Engana: Comparação de Somas de Dados e o Ponto de Virada entre Distribuições},
+  year         = {2026},
+  institution  = {Departamento de Ciência da Computação, Universidade Federal de Minas Gerais (UFMG)},
+  howpublished = {\url{https://github.com/Lealwbs/discrete-dice-analysis}}
+}
+```
+
+---
+
 ## Licença
 
-Distribuído sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este repositório adota **licenciamento duplo** para separar o código-fonte do manuscrito científico:
+
+- **Código-fonte (`src/`, `main.py`):** distribuído sob a **Licença MIT** ([`LICENSE`](LICENSE)).
+- **Artigo e figuras (`paper/`):** distribuídos sob a licença **Creative Commons Atribuição-NãoComercial-SemDerivações 4.0 Internacional (CC BY-NC-ND 4.0)** ([`paper/LICENSE-PAPER.txt`](paper/LICENSE-PAPER.txt)), permitindo leitura e compartilhamento com atribuição ao autor, sem uso comercial ou modificações derivadas sem autorização.
