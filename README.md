@@ -1,205 +1,259 @@
-# Análise Probabilística da Soma de Dados Discretos: A Falácia da Distância da Média e a Emergência da Média Geométrica no Crossover de Distribuições
+# Soma de Dados e o Ponto de Virada entre Distribuições
 
-**Autor:** Ítalo Leal  
-*Graduando em Sistemas de Informação — Universidade Federal de Minas Gerais (UFMG)*  
-*Interlocução acadêmica:* Prof. Dr. Jeroen van de Graaf (*Departamento de Ciência da Computação — ICEx / UFMG*)  
-*Disciplina de Origem:* Matemática Discreta  
+**Autor:** Ítalo Leal (Sistemas de Informação, DCC/ICEx, UFMG)
 
----
-
-## Resumo
-
-Neste repositório investiga-se um problema probabilístico originado na Primeira Avaliação (P1) de Matemática Discreta da UFMG: determinar se a soma 8 é mais provável no lançamento de 2 dados ou de 3 dados de seis faces. Embora a conclusão intuitiva de muitos alunos tenha sido correta ($P(S_2 = 8) > P(S_3 = 8)$), a justificativa comumente apresentada — baseada na menor distância euclidiana entre o alvo e o valor esperado da distribuição — constitui uma falácia estatística formal. 
-
-Demonstramos analiticamente a inconsistência do argumento aritmético através de contraexemplos rígidos (notadamente $2d$ vs $6d$) e derivamos a formulação fechada exata para o ponto de interseção contínuo (crossover de verossimilhança) via Teorema Central do Limite. Provamos que, para somas de variáveis independentes e identicamente distribuídas (i.i.d.), a invariância da razão média/variância anula o termo linear na razão de log-verossimilhança, revelando que a fronteira de decisão é governada pela **Média Geométrica** das esperanças corrigida pela **Média Logarítmica** e pelo **Coeficiente de Variação**.
+Este repositório reúne o código, os experimentos e o artigo em LaTeX nascidos de uma discussão após a primeira prova de Matemática Discreta na UFMG, ministrada pelo professor Jeroen van de Graaf.
 
 ---
 
-## 1. Origem do Problema e a Questão da P1
+## Como o problema surgiu
 
-Na prova de Matemática Discreta da UFMG, foi formulada a seguinte questão:
+Na prova, a Questão 4 (retirada dos exercícios 36 e 37 do Capítulo 7.1 do livro *Discrete Mathematics and Its Applications*, de Kenneth H. Rosen) fazia duas perguntas seguidas sobre o lançamento de dados honestos de 6 faces:
 
-> **Problema:** *Considere o lançamento de dados honestos de 6 faces. O que é mais provável: obter soma 8 com 2 dados ou com 3 dados?*
+1. **(a)** O que é mais provável: sair um total de **8** quando dois dados são lançados ou quando três dados são lançados?
+2. **(b)** O que é mais provável: sair um total de **9** quando dois dados são lançados ou quando três dados são lançados?
 
-As probabilidades exatas revelam:
-- Para 2 dados ($S_2$): Há $5$ combinações favoráveis de um total de $6^2 = 36$ resultados possíveis:
-  $$P(S_2 = 8) = \frac{5}{36} \approx 0.13889 \quad (13.89\%)$$
-- Para 3 dados ($S_3$): Há $21$ combinações favoráveis de um total de $6^3 = 216$ resultados possíveis:
-  $$P(S_3 = 8) = \frac{21}{216} = \frac{7}{72} \approx 0.09722 \quad (9.72\%)$$
+Pela contagem combinatória tradicional (como na [imagem original da prova](assets/questao_original_p1.png)), basta listar as tuplas possíveis:
+- Na **soma 8**, 2 dados têm $5$ combinações em $36$ ($P = \frac{5}{36} = \frac{30}{216} \approx 13{,}89\%$), enquanto 3 dados têm $21$ combinações em $216$ ($P = \frac{21}{216} \approx 9{,}72\%$). Logo, **2 dados** vencem.
+- Na **soma 9**, 2 dados têm $4$ combinações em $36$ ($P = \frac{4}{36} = \frac{24}{216} \approx 11{,}11\%$), enquanto 3 dados têm $25$ combinações em $216$ ($P = \frac{25}{216} \approx 11{,}57\%$). Logo, **3 dados** vencem.
 
-Portanto, de fato é mais provável obter soma 8 com 2 dados do que com 3 dados.
+Um amigo meu resolveu a questão de outro jeito, sem listar as combinações: ele calculou a média (esperança) de 2 dados ($E[S_2] = 7{,}0$) e a média de 3 dados ($E[S_3] = 10{,}5$) e olhou para a distância de cada soma até essas médias:
+- No item (a), $8$ está a distância $1{,}0$ de $7{,}0$ e a distância $2{,}5$ de $10{,}5$, então ele marcou **2 dados**.
+- No item (b), $9$ está a distância $1{,}5$ de $10{,}5$ e a distância $2{,}0$ de $7{,}0$, então ele marcou **3 dados**.
 
-### A Heurística dos Alunos
-Uma parcela expressiva dos estudantes respondeu à questão sem calcular a contagem combinatória exata, aplicando o seguinte raciocínio métrico:
-1. O valor esperado da soma de 2 dados é $E[S_2] = 2 \times 3.5 = 7$.
-2. O valor esperado da soma de 3 dados é $E[S_3] = 3 \times 3.5 = 10.5$.
-3. Para a soma alvo $X_0 = 8$:
-   $$|X_0 - E[S_2]| = |8 - 7| = 1.0$$
-   $$|X_0 - E[S_3]| = |8 - 10.5| = 2.5$$
-4. Como $1.0 < 2.5$, argumentaram que, por $X_0 = 8$ estar "mais próximo do centro" da distribuição de 2 dados do que da de 3 dados, $2$ dados seria necessariamente a opção mais provável.
+Na correção inicial, o professor não deu os pontos totais porque essa justificativa pela distância até a média não era uma prova geral. Meu amigo foi conversar com o professor para defender a ideia e eu fui junto acompanhar a discussão. No fim, o professor deu a pontuação total aos alunos porque, apesar de a regra não valer sempre, o raciocínio era inteligente.
 
-O professor Jeroen van de Graaf aceitou a resposta na correção ponderando o raciocínio criativo, ensejando um diálogo científico posterior sobre a validade e generalização desse princípio.
+Saí daquela conversa querendo entender melhor o problema. Na madrugada de 13 de dezembro de 2024, enviei um e-mail ao professor Jeroen com um contraexemplo comparando **2 dados e 6 dados** nas somas $13$ e $14$, mostrando que a média aritmética das esperanças falhava, e levantei a conjectura de que o ponto real de cruzamento entre as curvas era governado pela **média geométrica** das esperanças ($\mu_G = \sqrt{E[S_n] \cdot E[S_m]}$). O professor respondeu na manhã seguinte convidando para debatermos o argumento após a aula.
 
----
+A partir daquela discussão, desenvolvi este projeto para responder de vez às três perguntas centrais: **por que a distância até a média funcionou nos dois itens da prova, onde ela quebra e qual é a fórmula exata para o ponto em que uma quantidade de dados passa a ser mais provável que outra?**
 
-## 2. A Falácia da Distância Euclidiana da Média
+![Questão 4 recriada em LaTeX](assets/questao_p1_recriada.png)
 
-A heurística de comparar distâncias aritméticas à esperança ($|X_0 - E[S_n]| < |X_0 - E[S_m]|$) assume quatro hipóteses falsas sobre as distribuições:
-
-1. **Variâncias Idênticas:** Pressupõe que a dispersão em torno da média é igual para qualquer número de dados. No entanto, para $n$ variáveis i.i.d., a variância cresce linearmente:
-   $$\text{Var}(S_n) = n \cdot \text{Var}(D) = n \cdot \frac{35}{12}$$
-2. **Alturas Máximas Iguais:** Pressupõe que a probabilidade no pico (moda) é idêntica. Pelo Teorema Central do Limite, a altura máxima decai a uma taxa de $O(1/\sqrt{n})$:
-   $$\max_k P(S_2 = k) = P(S_2 = 7) = \frac{6}{36} \approx 0.1667$$
-   $$\max_k P(S_6 = k) = P(S_6 = 21) \approx 0.0928$$
-3. **Ponto de Crossover no Ponto Médio Aritmético:** Para que a distância aritmética fosse um classificador ótimo, a fronteira onde $P(S_n = X) = P(S_m = X)$ teria de coincidir com a média aritmética das esperanças:
-   $$X_{\text{aritmético}} = \frac{E[S_n] + E[S_m]}{2}$$
-
-### Contraexemplo Formal: 2 Dados vs 6 Dados
-
-Sejam $n = 2$ e $m = 6$ dados de 6 faces:
-- $E[S_2] = 2 \times 3.5 = 7$
-- $E[S_6] = 6 \times 3.5 = 21$
-- Ponto médio aritmético das esperanças:
-  $$X_m = \frac{7 + 21}{2} = 14.0$$
-
-#### Teste no Ponto Médio ($X_0 = 14$):
-Pela heurística dos alunos, em $X_0 = 14$ as distâncias são idênticas ($|14 - 7| = 7$ e $|14 - 21| = 7$), logo as probabilidades deveriam ser iguais.
-- Probabilidade real de 2 dados: $P(S_2 = 14) = 0$ (o valor máximo de 2 dados é 12).
-- Probabilidade real de 6 dados: $P(S_6 = 14) \approx 2.49\%$.
-
-#### Teste em $X_0 = 13$:
-Avalie a soma alvo $X_0 = 13$:
-- Distância a $E[S_2]$: $|13 - 7| = 6$
-- Distância a $E[S_6]$: $|13 - 21| = 8$
-
-Como $6 < 8$, a heurística da distância afirma categoricamente que $13$ é **mais provável de ocorrer com 2 dados do que com 6 dados**.
-No entanto:
-$$P(S_2 = 13) = 0.0\% \quad \text{vs} \quad P(S_6 = 13) \approx 1.62\%$$
-O evento é **impossível** com 2 dados, mas plenamente plausível com 6 dados. A heurística baseada na média aritmética, portanto, falha de forma absoluta.
+*(Veja a [imagem original da folha de prova](assets/questao_original_p1.png) e a versão recriada em LaTeX em [`paper/questao_p1_recriada.pdf`](paper/questao_p1_recriada.pdf)).*
 
 ---
 
-## 3. Derivação Analítica Contínua: A Emergência da Média Geométrica
+## Onde a distância até a média falha
 
-Pelo Teorema Central do Limite (TCL), à medida que o número de variáveis somadas cresce, a distribuição de probabilidade de $S_n$ converge rapidamente para uma distribuição normal contínua:
-$$S_n \sim \mathcal{N}(\mu_n, \sigma_n^2)$$
-com:
-$$\mu_n = n \mu_1, \quad \sigma_n^2 = n \sigma_1^2$$
-onde $\mu_1 = 3.5$ e $\sigma_1^2 = \frac{35}{12} \approx 2.9167$ para um dado de 6 faces.
+Usar a menor distância até a média ($|k - E[S_n]| < |k - E[S_m]|$) equivale a assumir que o ponto de virada entre $n$ dados e $m$ dados fica sempre na **média aritmética** das duas esperanças:
 
-Buscamos o ponto de corte $x^*$ no qual a densidade de probabilidade de $n$ dados se iguala à de $m$ dados ($m > n$):
-$$f_n(x) = f_m(x)$$
-$$\frac{1}{\sigma_n \sqrt{2\pi}} \exp\left( -\frac{(x - \mu_n)^2}{2\sigma_n^2} \right) = \frac{1}{\sigma_m \sqrt{2\pi}} \exp\left( -\frac{(x - \mu_m)^2}{2\sigma_m^2} \right)$$
+$$\mu_A(n, m) = \frac{E[S_n] + E[S_m]}{2}$$
 
-Aplicando o logaritmo natural em ambos os lados:
-$$-\ln \sigma_n - \frac{(x - \mu_n)^2}{2\sigma_n^2} = -\ln \sigma_m - \frac{(x - \mu_m)^2}{2\sigma_m^2}$$
-$$\frac{(x - \mu_n)^2}{2\sigma_n^2} - \frac{(x - \mu_m)^2}{2\sigma_m^2} = \ln\left( \frac{\sigma_m}{\sigma_n} \right) = \frac{1}{2}\ln\left( \frac{m}{n} \right)$$
+O problema é que, quando aumentamos o número de dados, duas coisas mudam ao mesmo tempo na distribuição:
+1. **A variância cresce linearmente** ($\text{Var}(S_n) = n \cdot \frac{35}{12}$), espalhando a curva de $m$ dados por um intervalo muito mais largo.
+2. **O pico da distribuição diminui** na ordem de $1/\sqrt{n}$, deixando a curva de $n$ dados mais alta perto do seu centro.
 
-Substituindo $\mu_n = n\mu_1$, $\mu_m = m\mu_1$, $\sigma_n^2 = n\sigma_1^2$ e $\sigma_m^2 = m\sigma_1^2$:
-$$\frac{(x - n\mu_1)^2}{n} - \frac{(x - m\mu_1)^2}{m} = \sigma_1^2 \ln\left( \frac{m}{n} \right)$$
+![Distribuições de 1 a 6 dados](assets/distribuicoes_1d_a_6d.png)
 
-Expandindo os binômios:
-$$\frac{x^2 - 2n\mu_1 x + n^2\mu_1^2}{n} - \frac{x^2 - 2m\mu_1 x + m^2\mu_1^2}{m} = \sigma_1^2 \ln\left( \frac{m}{n} \right)$$
-$$\left( \frac{1}{n} - \frac{1}{m} \right) x^2 - (2\mu_1 - 2\mu_1)x + \mu_1^2(n - m) = \sigma_1^2 \ln\left( \frac{m}{n} \right)$$
+Por causa disso, a regra da distância até a média pode errar nas **duas direções**:
 
-### Teorema do Cancelamento Linear em Somas I.I.D.
-Observe que o coeficiente linear em $x$ se anula identicamente:
-$$-2\mu_1 x - (-2\mu_1 x) = 0$$
-Isso ocorre porque a razão entre média e variância de uma soma de variáveis i.i.d. é uma **invariante universal**:
-$$\frac{E[S_n]}{\text{Var}(S_n)} = \frac{n\mu_1}{n\sigma_1^2} = \frac{\mu_1}{\sigma_1^2} \quad (\text{constante independente de } n)$$
+### 1. Erro mesmo dentro das somas possíveis: 2 dados vs 5 dados (soma 12)
+Compare $2$ dados ($E[S_2] = 7{,}0$) com $5$ dados ($E[S_5] = 17{,}5$) na soma $k = 12$ (que é possível nos dois lançamentos, já que $(6,6)$ soma $12$):
+- Distância até a média de 2 dados: $|12 - 7{,}0| = 5{,}0$
+- Distância até a média de 5 dados: $|12 - 17{,}5| = 5{,}5$
 
-Com o cancelamento do termo linear ($B = 0$), a equação quadrática simplifica-se para uma forma pura:
-$$\left( \frac{m - n}{nm} \right) x^2 = \mu_1^2 (m - n) + \sigma_1^2 \ln\left( \frac{m}{n} \right)$$
+Como $5{,}0 < 5{,}5$, a soma $12$ está mais próxima da média de 2 dados. Mesmo assim, a probabilidade real com 5 dados é maior:
 
-Multiplicando ambos os lados por $\frac{nm}{m - n}$:
-$$x^2 = nm \mu_1^2 + \sigma_1^2 nm \frac{\ln(m/n)}{m - n}$$
-$$x^2 = (nm \mu_1^2) \left[ 1 + \frac{\sigma_1^2}{\mu_1^2} \frac{\ln(m/n)}{m - n} \right]$$
+$$P(S_2 = 12) = \frac{1}{36} \approx 2{,}78\% \quad < \quad P(S_5 = 12) = \frac{305}{7776} \approx 3{,}92\%$$
 
-### A Relação Fundamental com Médias Clássicas
+![Comparação 2d vs 5d](assets/crossover_2d_5d.png)
 
-Definindo:
-1. **Média Geométrica ($\mu_g$)** das esperanças:
-   $$\mu_g = \sqrt{E[S_n] E[S_m]} = \sqrt{(n\mu_1)(m\mu_1)} = \mu_1 \sqrt{nm}$$
-2. **Coeficiente de Variação ($CV$)** do dado individual:
-   $$CV = \frac{\sigma_1}{\mu_1} \implies CV^2 = \frac{\sigma_1^2}{\mu_1^2} = \frac{35/12}{(7/2)^2} = \frac{5}{21} \approx 0.2381$$
-3. **Média Logarítmica ($L(n, m)$)** entre $n$ e $m$:
-   $$L(n, m) = \frac{m - n}{\ln(m) - \ln(n)}$$
+### 2. Erro na direção contrária: 4 dados vs 5 dados (soma 16)
+Compare $4$ dados ($E[S_4] = 14{,}0$) com $5$ dados ($E[S_5] = 17{,}5$) na soma $k = 16$:
+- A soma $16$ está mais perto da média de 5 dados ($|16 - 17{,}5| = 1{,}5$) do que da média de 4 dados ($|16 - 14{,}0| = 2{,}0$).
+- Porém, como o pico de 4 dados é mais alto, **4 dados ainda vencem na soma 16**:
 
-Obtemos a equação fechada analítica exata para a raiz positiva:
-$$\bbox[15px,border:2px solid #2980b9]{x^* = \mu_g \sqrt{1 + \frac{CV^2}{L(n, m)}}}$$
+$$P(S_4 = 16) = \frac{125}{1296} = \frac{750}{7776} \approx 9{,}65\% \quad > \quad P(S_5 = 16) = \frac{735}{7776} \approx 9{,}45\%$$
 
-### Interpretação Epistemológica
-A intuição empírica apresentada por Ítalo Leal ao professor — sugerindo que a fronteira real estaria associada à **Média Geométrica** e não à média aritmética — é matematicamente validada:
-- A **Média Geométrica** ($\mu_g$) é rigorosamente o **termo assintótico dominante de ordem zero** da interseção.
-- O termo $\sqrt{1 + \frac{CV^2}{L(n, m)}}$ funciona como um fator de correção estocástico induzido pela variabilidade relativa das distribuições.
+### 3. Erro fora do limite máximo de 2 dados: 2 dados vs 6 dados (somas 13 e 14)
+Compare $2$ dados ($E[S_2] = 7{,}0$) com $6$ dados ($E[S_6] = 21{,}0$), cuja média aritmética é $14{,}0$:
+- Na soma $k = 13$, a distância até a média de 2 dados é $6{,}0$, menor que a distância até a média de 6 dados ($8{,}0$).
+- A regra da distância diria que $13$ é mais provável com 2 dados, mas $13$ é impossível em 2 dados ($P(S_2 = 13) = 0\%$, contra $P(S_6 = 13) \approx 1{,}62\%$).
+
+![Comparação 2d vs 6d](assets/crossover_2d_6d.png)
 
 ---
 
-## 4. Distribuição Discreta Combinatória Exata
+## O ponto de virada real: Média Geométrica e Média Logarítmica
 
-No domínio discreto exato, a função de probabilidade da soma de $n$ dados de $s$ faces é obtida por funções geradoras:
-$$G(x) = \left( \frac{x + x^2 + \dots + x^s}{s} \right)^n = \frac{x^n}{s^n} \left( \frac{1 - x^s}{1 - x} \right)^n$$
+Aproximando a soma de $n$ dados pela distribuição normal $\mathcal{N}(n\mu_1, n\sigma_1^2)$ (via Teorema Central do Limite) e igualando as densidades de $n$ dados e $m$ dados ($f_n(x) = f_m(x)$), chegamos a:
 
-A expansão em séries fornece a fórmula de De Moivre–Laplace / Uspensky:
-$$P(S_n = k) = \frac{1}{s^n} \sum_{j=0}^{\lfloor \frac{k - n}{s} \rfloor} (-1)^j \binom{n}{j} \binom{k - sj - 1}{n - 1}$$
+$$\frac{(x - n\mu_1)^2}{n} - \frac{(x - m\mu_1)^2}{m} = \sigma_1^2 \ln\!\left(\frac{m}{n}\right)$$
 
-### Comparação entre os Modelos
+Ao expandir os quadrados, **o termo linear em $x$ se cancela exatamente** ($-2\mu_1 x + 2\mu_1 x = 0$), porque a razão entre média e variância na soma de variáveis i.i.d. não depende da quantidade de dados ($\frac{n\mu_1}{n\sigma_1^2} = \frac{\mu_1}{\sigma_1^2}$). Isolando $x > 0$, obtemos a fórmula fechada do ponto de interseção:
 
-| Par de Dados | $E(nd)$ | $E(md)$ | Média Aritmética ($X_m$) | Média Geométrica ($\mu_g$) | Crossover Gaussiano Analítico ($x^*$) | Crossover Discreto Exato ($k_{\text{cross}}$) |
+$$x^*(n, m) = \mu_G(n, m) \sqrt{1 + \frac{\text{CV}_1^2}{L(n, m)}}$$
+
+onde:
+- $\mu_G(n, m) = \sqrt{E[S_n] E[S_m]} = \mu_1 \sqrt{nm}$ é a **média geométrica** das esperanças;
+- $L(n, m) = \frac{m - n}{\ln(m) - \ln(n)}$ é a **média logarítmica** entre $n$ e $m$;
+- $\text{CV}_1^2 = \frac{\sigma_1^2}{\mu_1^2} = \frac{s - 1}{3(s + 1)}$ é o quadrado do **coeficiente de variação** de um dado (para $6$ faces, $\text{CV}_1^2 = \frac{5}{21} \approx 0{,}2381$).
+
+### Por que deu certo na prova (2d vs 3d)?
+Para $n = 2$ e $m = 3$:
+- Média geométrica: $\mu_G = 8{,}5732$
+- Média aritmética (usada pelo meu amigo): $\mu_A = 8{,}7500$
+- Ponto de virada contínuo real: $x^* = 8{,}9775$
+
+Como tanto $8{,}75$ quanto $8{,}98$ caem entre os inteiros $8$ e $9$, qualquer corte entre $8$ e $9$ dá exatamente a mesma resposta para valores inteiros: até $8$ dá 2 dados, e de $9$ em diante dá 3 dados.
+
+![Comparação 2d vs 3d](assets/crossover_2d_3d.png)
+
+### Resumo comparativo para vários pares de dados
+
+| Par de dados | $E[S_n]$ | $E[S_m]$ | Média Geométrica ($\mu_G$) | Média Aritmética ($\mu_A$) | Ponto de Virada ($x^*$) | Virada Discreta Exata |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **2d vs 3d** | 7.00 | 10.50 | 8.7500 | 8.5732 | **8.9775** | **k = 9** |
-| **2d vs 4d** | 7.00 | 14.00 | 10.5000 | 9.8995 | **10.2998** | **k = 11** |
-| **2d vs 6d** | 7.00 | 21.00 | 14.0000 | 12.1244 | **12.5145** | **k = 13** |
-| **3d vs 4d** | 10.50 | 14.00 | 12.2500 | 12.1244 | **12.5327** | **k = 13** |
-| **3d vs 6d** | 10.50 | 21.00 | 15.7500 | 14.8492 | **15.2522** | **k = 16** |
+| **2d vs 3d** | 7,0 | 10,5 | 8,5732 | 8,7500 | **8,9775** | **k = 9** |
+| **3d vs 4d** | 10,5 | 14,0 | 12,1244 | 12,2500 | **12,5327** | **k = 13** |
+| **4d vs 5d** | 14,0 | 17,5 | 15,6525 | 15,7500 | **16,0629** | **k = 17** |
+| **3d vs 5d** | 10,5 | 17,5 | 13,5554 | 14,0000 | **13,9615** | **k = 14** *(empate exato: $5/72$)* |
+| **2d vs 4d** | 7,0 | 14,0 | 9,8995 | 10,5000 | **10,2998** | **k = 11** |
+| **2d vs 5d** | 7,0 | 17,5 | 11,0680 | 12,2500 | **11,4633** | **k = 12** |
+| **3d vs 6d** | 10,5 | 21,0 | 14,8492 | 15,7500 | **15,2522** | **k = 16** |
+| **2d vs 6d** | 7,0 | 21,0 | 12,1244 | 14,0000 | **12,5145** | **k = 13** |
 
-#### Conclusões da Tabela:
-- Para **2d vs 3d**: A média aritmética prevê transição em 8.75, a geométrica em 8.57 e o crossover analítico em 8.98. No discreto, para somas $k \le 8$, $2$ dados domina; para $k \ge 9$, $3$ dados passa a ser mais provável.
-- Para **2d vs 6d**: A média aritmética prevê transição em 14.00 (onde 2 dados já tem probabilidade zero!), enquanto a média geométrica prevê 12.12 e o analítico 12.51. No discreto, o crossover ocorre exatamente em $k = 13$.
-- Em todos os casos, a aproximação $x^*$ baseada na média geométrica e logarítmica prediz com precisão o primeiro inteiro de transição ($\lceil x^* \rceil$ ou $\lfloor x^* \rceil$).
-
----
-
-## 5. Estado da Arte e Pesquisa na Literatura
-
-### O problema já foi solucionado anteriormente?
-1. **No Contexto Geral de Estatística e Aprendizado de Máquina:**
-   A igualdade de duas densidades normais é a fronteira de decisão da **Análise Discriminante Quadrática (QDA)** e do critério de razão de verossimilhança de **Neyman-Pearson** / Decisão Bayesiana sob custo uniforme. Nos livros-texto gerais, a equação resultante é resolvida genericamente pela fórmula quadrática de Bhaskara ($Ax^2 + Bx + C = 0$).
-2. **A Propriedade Algébrica Específica para Somas I.I.D.:**
-   A literatura raramente destaca que, para somas de variáveis i.i.d., o termo linear $B$ anula-se identicamente devido à constância da razão média/variância, colapsando a solução geral na forma fechada elegante expressa em termos da **Média Geométrica** e da **Média Logarítmica**. 
-3. **No Contexto Didático da Matemática Discreta:**
-   O problema é um exemplo pedagógico formidável de como heurísticas intuitivas de distância euclidiana (muito comuns em estudantes) podem produzir conclusões acidentalmente corretas a partir de premissas estatisticamente falsas.
+*(Curiosidade: o par **3d vs 5d** na soma $k = 14$ é o único caso não trivial para dados de 6 faces em que as probabilidades discretas empatam exatamente, $P(S_3 = 14) = P(S_5 = 14) = \frac{5}{72} \approx 6{,}94\%$, como já aparecia na [planilha inicial do laboratório](assets/planilha_exploratoria_dados.ods)).*
 
 ---
 
-## 6. Como Reproduzir e Executar o Código
+## Provas e Evidências de que a Fórmula Está Correta
 
-Todas as instruções detalhadas de instalação de bibliotecas, execução de scripts e uso como pacote Python estão descritas no arquivo:
+A validade da fórmula fechada $x^*(n, m) = \mu_G(n, m) \sqrt{1 + \frac{\text{CV}_1^2}{L(n, m)}}$ pode ser comprovada de quatro formas independentes (todas reproduzíveis rodando `python main.py --verify`):
 
-👉 **[Consulte o Guia de Uso (USAGE.md)](file:///c:/Users/Italo/Documents/Github/discrete-dice-analysis/USAGE.md)**
+### 1. Prova por substituição algébrica direta (erro zero)
+Para que duas densidades normais $f_n(x)$ e $f_m(x)$ sejam idênticas em $x^*$, a diferença entre seus expoentes quadráticos precisa igualar exatamente $2\ln(\sigma_m / \sigma_n) = \ln(m / n)$:
 
-Comandos rápidos:
-```bash
-# Instalar dependências
-pip install numpy scipy matplotlib
+$$\Delta(x) = \frac{(x - n\mu_1)^2}{n\sigma_1^2} - \frac{(x - m\mu_1)^2}{m\sigma_1^2} = \frac{1}{\sigma_1^2}\left[\left(\frac{m - n}{nm}\right) x^2 - \mu_1^2(m - n)\right]$$
 
-# Executar a análise da questão da P1 e contraexemplo formal
-python main.py
+Substituindo $x^2 = (x^*)^2 = nm\mu_1^2 \left(1 + \frac{\sigma_1^2}{\mu_1^2} \frac{\ln(m/n)}{m - n}\right)$ diretamente na expressão acima:
 
-# Comparar quaisquer quantidades de dados (ex: 2d vs 4d)
-python main.py --compare 2 4
+$$\Delta(x^*) = \frac{1}{\sigma_1^2}\left[(m - n)\mu_1^2 + \sigma_1^2 \ln\!\left(\frac{m}{n}\right) - \mu_1^2(m - n)\right] = \ln\!\left(\frac{m}{n}\right)$$
 
-# Exibir os gráficos interativos com curvas de densidade e crossover
-python main.py --p1 --plot
+Os termos $(m - n)\mu_1^2$ cancelam-se de forma exata, resultando em $f_n(x^*) = f_m(x^*)$ sem nenhuma aproximação intermediária.
+
+### 2. Verificação numérica independente (Bisseção vs Fórmula Fechada)
+No módulo [`src/crossover.py`](src/crossover.py), a função `verify_gaussian_crossover` encontra a raiz da equação $f_n(x) - f_m(x) = 0$ no intervalo $[\mu_n, \mu_m]$ pelo método numérico da bisseção (sem usar a fórmula) e também avalia o resíduo $|f_n(x^*) - f_m(x^*)|$:
+
+| Par | Fórmula Fechada ($x^*$) | Raiz Numérica por Bisseção | Resíduo $\|f_n(x^*) - f_m(x^*)\|$ | Razão $x^* / \mu_G$ | $\lceil x^* \rceil = k_{\text{cross}}$ |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| **2d vs 3d** | `8.97750742` | `8.97750742` | `8.33e-17` | `1.047158` | Sim ($k = 9$) |
+| **3d vs 4d** | `12.53271210` | `12.53271210` | `1.39e-17` | `1.033681` | Sim ($k = 13$) |
+| **4d vs 5d** | `16.06289847` | `16.06289847` | `2.78e-17` | `1.026221` | Sim ($k = 17$) |
+| **3d vs 5d** | `13.96152966` | `13.96152966` | `8.33e-17` | `1.029958` | Sim ($k = 14$) |
+| **2d vs 5d** | `11.46334952` | `11.46334952` | `6.94e-17` | `1.035723` | Sim ($k = 12$) |
+| **2d vs 6d** | `12.51450588` | `12.51450588` | `2.95e-17` | `1.032179` | Sim ($k = 13$) |
+| **10d vs 20d** | `49.90424416` | `49.90424416` | `6.51e-18` | `1.008218` | Sim ($k = 50$) |
+| **50d vs 100d** | `247.89547783` | `247.89547783` | `3.93e-24` | `1.001649` | Sim ($k = 248$) |
+
+O resíduo $|f_n(x^*) - f_m(x^*)|$ fica na ordem de $10^{-17}$ a $10^{-24}$ (zero absoluto na precisão de máquina de 64 bits IEEE 754).
+
+### 3. Confirmação assintótica da conjectura da Média Geométrica
+Quando o número de dados cresce ($n, m \to \infty$), a média logarítmica $L(n, m) \ge \sqrt{nm} \to \infty$ faz o termo $\frac{\text{CV}_1^2}{L(n, m)}$ tender a zero:
+
+$$\lim_{n, m \to \infty} \frac{x^*(n, m)}{\mu_G(n, m)} = \lim_{n, m \to \infty} \sqrt{1 + \frac{\text{CV}_1^2}{L(n, m)}} = 1$$
+
+Veja na coluna $x^* / \mu_G$ da tabela acima como a razão cai de $1{,}047$ (em `2d vs 3d`) para $1{,}008$ (em `10d vs 20d`) e $1{,}0016$ (em `50d vs 100d`). Isso prova que a **média geométrica** proposta no e-mail de 13/12/2024 é, de fato, o limite assintótico exato do ponto de interseção.
+
+### 4. Concordância com a combinatória discreta de De Moivre
+Em todos os pares testados, o primeiro inteiro $k_{\text{cross}}$ em que a probabilidade combinatória exata de $m$ dados supera ou empata com a de $n$ dados coincide com o teto da fórmula contínua: $k_{\text{cross}} = \lceil x^*(n, m) \rceil$.
+
+---
+
+## Artigo em LaTeX
+
+O desenvolvimento matemático completo, incluindo o contexto histórico (Galileu e De Moivre), a dedução por funções geradoras, a demonstração do cancelamento linear, a condição crítica entre $x^*$ e a média aritmética e as provas de verificação, está disponível na pasta [`paper/`](paper/):
+
+- 📄 **[Artigo completo compilado (`paper/artigo.pdf`)](paper/artigo.pdf)** | [Código-fonte LaTeX (`paper/artigo.tex`)](paper/artigo.tex)
+- 📝 **[Questão da prova recriada (`paper/questao_p1_recriada.pdf`)](paper/questao_p1_recriada.pdf)** | [Código-fonte LaTeX (`paper/questao_p1_recriada.tex`)](paper/questao_p1_recriada.tex)
+- 📚 **[Referências bibliográficas (`paper/referencias.bib`)](paper/referencias.bib)**
+
+---
+
+## Estrutura do repositório
+
+```text
+discrete-dice-analysis/
+├── main.py                              # Script principal de linha de comando (CLI)
+├── requirements.txt                     # Dependências Python (numpy e matplotlib)
+├── README.md                            # Documentação e contextualização do projeto
+├── LICENSE                              # Licença MIT
+├── src/                                 # Módulos Python
+│   ├── __init__.py
+│   ├── dice_odds.py                     # Cálculo combinatório exato (memoização e fórmula de De Moivre)
+│   ├── crossover.py                     # Ponto de interseção gaussiano (x*), verificação e médias clássicas
+│   ├── monte_carlo.py                   # Simulação estocástica de Monte Carlo
+│   └── plot.py                          # Geração dos gráficos com Matplotlib
+├── paper/                               # Artigo científico e recriação da questão em LaTeX
+│   ├── artigo.tex
+│   ├── artigo.pdf
+│   ├── questao_p1_recriada.tex
+│   ├── questao_p1_recriada.pdf
+│   ├── referencias.bib
+│   └── figures/                         # Figuras vetoriais (.pdf) usadas no artigo
+└── assets/                              # Imagens, gráficos (.png) e planilha original (.ods)
+    ├── questao_original_p1.png
+    ├── questao_p1_recriada.png
+    ├── planilha_exploratoria_dados.ods
+    ├── distribuicoes_1d_a_6d.png
+    ├── crossover_2d_3d.png
+    ├── crossover_2d_5d.png
+    └── crossover_2d_6d.png
 ```
 
 ---
 
-## 7. Referências Bibliográficas
+## Como executar o código
 
-1. **De Moivre, A.** (1718). *The Doctrine of Chances: Or, A Method of Calculating the Probability of Events in Play*. W. Pearson, London.
-2. **Feller, W.** (1968). *An Introduction to Probability Theory and Its Applications*, Vol. 1 (3rd ed.). John Wiley & Sons.
-3. **Carlson, B. C.** (1972). *The Logarithmic Mean*. The American Mathematical Monthly, 79(6), 615–618.
-4. **Hogg, R. V., McKean, J., & Craig, A. T.** (2018). *Introduction to Mathematical Statistics* (8th ed.). Pearson.
-5. **Uspensky, J. V.** (1937). *Introduction to Mathematical Probability*. McGraw-Hill Book Company, New York.
-6. **van de Graaf, J.** *Notas de Aula de Matemática Discreta*. Departamento de Ciência da Computação (DCC), ICEx, Universidade Federal de Minas Gerais (UFMG).
+### 1. Instalar dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Rodar pelo terminal (`main.py`)
+
+```bash
+# Reproduzir a análise da questão da prova (itens a e b), contraexemplos e verificação da fórmula
+python main.py
+
+# Rodar apenas a tabela de verificação algébrica e numérica da fórmula x*(n, m)
+python main.py --verify
+
+# Comparar quaisquer duas quantidades de dados (ex: 4 dados vs 5 dados)
+python main.py --compare 4 5
+
+# Abrir os gráficos interativos
+python main.py --compare 2 5 --plot
+
+# Regerar todas as figuras nas pastas assets/ e paper/figures/
+python main.py --save-plots
+```
+
+### 3. Usar as funções em outros scripts Python
+
+```python
+from src.dice_odds import exact_dice_odds, de_moivre_dice_probability
+from src.crossover import exact_gaussian_crossover, discrete_crossover_point, verify_gaussian_crossover
+from src.monte_carlo import monte_carlo_odds
+
+# Probabilidade exata da soma 8 e da soma 9 com 2 e 3 dados
+print(exact_dice_odds(sum_value=8, num_dice=2))  # 0.138888... (30/216)
+print(exact_dice_odds(sum_value=8, num_dice=3))  # 0.097222... (21/216)
+print(exact_dice_odds(sum_value=9, num_dice=2))  # 0.111111... (24/216)
+print(exact_dice_odds(sum_value=9, num_dice=3))  # 0.115740... (25/216)
+
+# Ponto de virada contínuo (x*), virada discreta (k_cross) e verificação de precisão
+x_star = exact_gaussian_crossover(n=2, m=3, sides=6)
+k_cross, p_2d, p_3d = discrete_crossover_point(n=2, m=3, sides=6)
+verificacao = verify_gaussian_crossover(n=2, m=3, sides=6)
+print(f"x* = {x_star:.4f}, virada discreta em k = {k_cross}, residuo = {verificacao['density_residual']:.2e}")
+
+# Simulação de Monte Carlo (100.000 lançamentos)
+print(monte_carlo_odds(target_sum=8, num_dice=3, num_rolls=100_000, seed=42))
+```
+
+---
+
+## Licença
+
+Distribuído sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
